@@ -7,10 +7,14 @@ import com.gianniniseba.authservice.entity.User;
 import com.gianniniseba.authservice.exception.InvalidCredentialsException;
 import com.gianniniseba.authservice.exception.UserAlreadyExistsException;
 import com.gianniniseba.authservice.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class AuthService implements IAuthService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public AuthResponse register(RegisterRequest request) {

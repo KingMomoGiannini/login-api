@@ -1,0 +1,9 @@
+30/11/2025
+API Base -> Creada
+
+Errores: Status code 401 que generaba Spring Security por no configurar previamente (SecurityConfig.java)
+
+Solucionado -> Cree SecurityConfig.java y coloqué las configuraciones para evitar errores 401 mientras realizaba las pruebas con Postman (Crear usuario mediante JSON).
+
+Siguiente error: Faltaba inyeccion de dependencias en AuthService (@Service y @RequiredArgsConstructor)
+___________________________________________________________________________________________
