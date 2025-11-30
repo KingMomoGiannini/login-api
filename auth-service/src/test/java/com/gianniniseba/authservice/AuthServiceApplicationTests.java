@@ -1,4 +1,4 @@
-package com.gianniniseba.auth_service;
+package com.gianniniseba.authservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
