@@ -1,6 +1,6 @@
 # login-api
 
-##Estructura de capas de la api:
+#Estructura de capas de la api:
 com.seba.authservice
  ├─ config        // Configuración general (CORS, seguridad, etc.)
  ├─ controller    // Controladores REST (LoginController, AuthController...)
