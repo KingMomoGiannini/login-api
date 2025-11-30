@@ -8,6 +8,7 @@ import com.gianniniseba.authservice.exception.InvalidCredentialsException;
 import com.gianniniseba.authservice.exception.UserAlreadyExistsException;
 import com.gianniniseba.authservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class AuthService implements IAuthService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public AuthResponse register(RegisterRequest request) {
@@ -27,10 +29,12 @@ public class AuthService implements IAuthService {
             throw new UserAlreadyExistsException("El email ingresado ya se encuentra en uso.");
         }
 
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
-                .password(request.getPassword())
+                .password(encodedPassword)
                 .enabled(true)
                 .build();
 
@@ -50,13 +54,13 @@ public class AuthService implements IAuthService {
                         () -> new InvalidCredentialsException("Usuario o contraseña incorrectos.")
                 );
 
-        if(!user.getPassword().equals(request.getPassword())){
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
             throw new InvalidCredentialsException("Usuario o contraseña incorrectos.");
 
         }
 
         return AuthResponse.builder()
-                .message("Inicio de sesión exitoso.")
+                .message("Login exitoso.")
                 .token(null)
                 .build();
     }
