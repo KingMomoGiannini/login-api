@@ -18,11 +18,12 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Para API REST, lo desactivamos
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // registro/login sin auth
-                        .anyRequest().authenticated()            // el resto, protegido
+                        .requestMatchers("/auth/**").permitAll() // los endpoints despues de esta directiva, se le permiten a todos los usuarios
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().hasRole("USER")
                 );
 
-        // Más adelante acá enchufamos JWT, etc.
+        // más adelante acá enchufamos JWT, etc.
         return http.build();
     }
 

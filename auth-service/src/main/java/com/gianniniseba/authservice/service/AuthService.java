@@ -3,19 +3,25 @@ package com.gianniniseba.authservice.service;
 import com.gianniniseba.authservice.dto.AuthResponse;
 import com.gianniniseba.authservice.dto.LoginRequest;
 import com.gianniniseba.authservice.dto.RegisterRequest;
+import com.gianniniseba.authservice.entity.Role;
+import com.gianniniseba.authservice.entity.RoleName;
 import com.gianniniseba.authservice.entity.User;
 import com.gianniniseba.authservice.exception.InvalidCredentialsException;
 import com.gianniniseba.authservice.exception.UserAlreadyExistsException;
+import com.gianniniseba.authservice.repository.RoleRepository;
 import com.gianniniseba.authservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService implements IAuthService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -31,11 +37,15 @@ public class AuthService implements IAuthService {
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
+        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                .orElseThrow( () -> new IllegalStateException("ROLE_USER no esta configurado en la base.") );
+
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(encodedPassword)
                 .enabled(true)
+                .roles(Set.of(userRole))
                 .build();
 
         userRepository.save(user);
