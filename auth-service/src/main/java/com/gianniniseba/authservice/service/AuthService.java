@@ -23,6 +23,7 @@ public class AuthService implements IAuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Override
     public AuthResponse register(RegisterRequest request) {
@@ -69,9 +70,11 @@ public class AuthService implements IAuthService {
 
         }
 
+        String token = jwtService.generateToken(user);
+
         return AuthResponse.builder()
                 .message("Login exitoso.")
-                .token(null)
+                .token(token)
                 .build();
     }
 }
