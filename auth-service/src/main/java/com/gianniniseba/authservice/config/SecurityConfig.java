@@ -26,10 +26,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Para API REST, lo desactivamos
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ) // porque usaremos JWT, no sesiones
+                ) // porque usamos JWT, no sesiones
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // los endpoints despues de esta directiva, se le permiten a todos los usuarios
-                        .requestMatchers("/test/**").authenticated() // cualquier otro endpoint, requiere autenticacion
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/test/**").authenticated()     // si lo seguís usando
+                        .requestMatchers("/users/me").authenticated()     // con estar logueado alcanza
+                        .requestMatchers("/admin/**").hasRole("ADMIN")   // solo admins
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
