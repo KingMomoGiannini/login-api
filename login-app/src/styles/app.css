@@ -1,0 +1,16 @@
+body {
+  background: #0f1115;
+}
+
+.container {
+  color: #e9ecef;
+}
+
+.card {
+  border-radius: 14px;
+}
+
+pre {
+  background: #111827 !important;
+  color: #e5e7eb !important;
+}
