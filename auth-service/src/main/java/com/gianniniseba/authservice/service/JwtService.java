@@ -4,19 +4,23 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.gianniniseba.authservice.entity.User;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+// import org.springframework.beans.factory.annotation.Value;
+// import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.stream.Collectors;
 
-@Service
+/*
+ * Servicio JWT anterior - Reemplazado por OAuth2TokenService
+ * Comentado para evitar que Spring intente crear el bean y busque jwt.secret
+ */
+// @Service
 public class JwtService {
 
-    @Value("${jwt.secret}")
+    // @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration-ms}")
+    // @Value("${jwt.expiration-ms}")
     private Long expirationMs;
 
     private Algorithm getAlgorithm(){

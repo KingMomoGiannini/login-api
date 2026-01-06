@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -47,14 +48,58 @@ public class OAuth2ResourceServerConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.decoder(jwtDecoder))
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .permitAll()
+                        .jwt(jwt -> jwt
+                                .decoder(jwtDecoder)
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
                 );
 
         return http.build();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            // Extraemos los roles del claim "authorities" o "roles"
+            Object authoritiesClaim = jwt.getClaim("authorities");
+            if (authoritiesClaim != null) {
+                if (authoritiesClaim instanceof String) {
+                    String authoritiesStr = (String) authoritiesClaim;
+                    return java.util.stream.Stream.of(authoritiesStr.split("\\s+"))
+                            .filter(auth -> !auth.isEmpty())
+                            .map(org.springframework.security.core.authority.SimpleGrantedAuthority::new)
+                            .collect(java.util.stream.Collectors.toList());
+                } else if (authoritiesClaim instanceof List) {
+                    @SuppressWarnings("unchecked")
+                    List<String> authoritiesList = (List<String>) authoritiesClaim;
+                    return authoritiesList.stream()
+                            .map(org.springframework.security.core.authority.SimpleGrantedAuthority::new)
+                            .collect(java.util.stream.Collectors.toList());
+                }
+            }
+            
+            // Si no hay authorities, intentamos con "roles"
+            Object rolesClaim = jwt.getClaim("roles");
+            if (rolesClaim != null) {
+                if (rolesClaim instanceof String) {
+                    String rolesStr = (String) rolesClaim;
+                    return java.util.stream.Stream.of(rolesStr.split("\\s+"))
+                            .filter(role -> !role.isEmpty())
+                            .map(org.springframework.security.core.authority.SimpleGrantedAuthority::new)
+                            .collect(java.util.stream.Collectors.toList());
+                } else if (rolesClaim instanceof List) {
+                    @SuppressWarnings("unchecked")
+                    List<String> rolesList = (List<String>) rolesClaim;
+                    return rolesList.stream()
+                            .map(org.springframework.security.core.authority.SimpleGrantedAuthority::new)
+                            .collect(java.util.stream.Collectors.toList());
+                }
+            }
+            
+            return java.util.Collections.emptyList();
+        });
+        return converter;
     }
 
     @Bean
